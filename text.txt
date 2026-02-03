@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You | Valentine's Day 2026</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,600&family=Manrope:wght@300;500;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-deep: #0f0510;
+            --accent-red: #ff3b6b;
+            --accent-pink: #ff9eb5;
+            --accent-glow: rgba(255, 59, 107, 0.4);
+            --glass-surface: rgba(20, 10, 25, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8f8f8;
+            --text-muted: #a090a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Manrope', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        /* --- Interactive Background --- */
+        #cosmos-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+        }
+
+        /* --- Main UI Structure --- */
+        .viewport {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* --- Slide Transitions --- */
+        .stage {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95) translateY(20px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stage.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+
+        .stage.exit {
+            transform: scale(1.05) translateY(-20px);
+            opacity: 0;
+            filter: blur(10px);
+        }
+
+        /* --- Typography --- */
+        h1, h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-style: italic;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 90%;
+            margin-bottom: 2rem;
+        }
+
+        /* --- Components --- */
+        
+        /* The Biometric Button */
+        .fingerprint-scanner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 1px solid var(--accent-red);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 0 30px var(--accent-glow);
+            transition: transform 0.2s ease;
+        }
+
+        .fingerprint-scanner:active { transform: scale(0.95); }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #fff;
+            top: 0;
+            box-shadow: 0 0 10px #fff;
+            animation: scan 1.5s infinite linear;
+            display: none;
+        }
+        
+        .fingerprint-scanner.scanning .scan-line { display: block; }
+        
+        .fingerprint-icon {
+            font-size: 2rem;
+            color: var(--accent-red);
+            opacity: 0.8;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* The Heart Container */
+        .heart-container {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            margin-bottom: 2rem;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .svg-heart {
+            fill: var(--accent-red);
+            filter: drop-shadow(0 0 20px var(--accent-red));
+        }
+
+        /* The Letter Card */
+        .letter-card {
+            background: var(--glass-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 30px;
+            width: 100%;
+            transform-style: preserve-3d;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+        }
+
+        /* Music Toggle */
+        .music-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        .music-fab:hover { background: var(--accent-red); border-color: var(--accent-red); }
+
+        /* Next Button */
+        .btn-ghost {
+            margin-top: 1rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 30px;
+            border-radius: 100px;
+            color: #fff;
+            font-family: 'Manrope', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-ghost:hover { background: #fff; color: #000; }
+
+        .progress-ring {
+            position: absolute;
+            top: 0; left: 0;
+            transform: rotate(-90deg);
+        }
+        .progress-ring__circle {
+            stroke: var(--accent-red);
+            stroke-dasharray: 251; /* 2 * PI * 40 */
+            stroke-dashoffset: 251;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/11/22/audio_febc508520.mp3?filename=romantic-piano-127926.mp3" type="audio/mpeg">
+    </audio>
+
+    <canvas id="cosmos-canvas"></canvas>
+
+    <div class="music-fab" onclick="toggleMusic()">
+        <i class="fas fa-music" id="music-icon"></i>
+    </div>
+
+    <div class="viewport">
+        
+        <div class="stage active" id="stage-1">
+            <h2 style="font-size: 1.5rem; color: var(--accent-pink);">Feb 14, 2026</h2>
+            <h1>Access Required</h1>
+            <p>This message is encrypted with affection.<br>Identify yourself to proceed.</p>
+            
+            <div class="fingerprint-scanner" id="scanner" onmousedown="startScan()" onmouseup="stopScan()" ontouchstart="startScan()" ontouchend="stopScan()">
+                <svg class="progress-ring" width="80" height="80">
+                    <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="39" cx="40" cy="40"/>
+                </svg>
+                <i class="fas fa-fingerprint fingerprint-icon"></i>
+                <div class="scan-line"></div>
+            </div>
+            <p style="font-size: 0.8rem; margin-top: 15px; opacity: 0.5;">Hold to Unlock</p>
+        </div>
+
+        <div class="stage" id="stage-2">
+            <div class="heart-container">
+                <svg viewBox="0 0 24 24" class="svg-heart" width="100%" height="100%">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+            <h1 style="font-size: 3rem">Hello, <span class="recipient-name">Love</span></h1>
+            <p>I've been waiting for you.</p>
+            <button class="btn-ghost" onclick="navigate(2, 3)">Read Letter</button>
+        </div>
+
+        <div class="stage" id="stage-3">
+            <div class="letter-card">
+                <p id="typewriter-area" style="text-align: left; margin-bottom: 0; min-height: 150px; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #fff;"></p>
+            </div>
+            <button class="btn-ghost" style="margin-top: 2rem;" onclick="navigate(3, 4)">One Last Thing</button>
+        </div>
+
+        <div class="stage" id="stage-4">
+            <h1 style="font-size: 4rem; line-height: 0.9;">Happy<br>Valentine's<br>Day</h1>
+            <p style="margin-top: 1rem;">You are my favorite notification.</p>
+            <div class="heart-container" style="animation-duration: 3s;">
+                <i class="fas fa-infinity" style="font-size: 3rem; color: var(--accent-pink);"></i>
+            </div>
+            <button class="btn-ghost" onclick="location.reload()">Replay</button>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // --- 1. CONFIGURATION (CUSTOMIZE HERE) ---
+        const config = {
+            name: "Beautiful", // Change this to their name
+            message: "I don't need a special day to tell you how much I love you, but I'll take any excuse to celebrate you. You make my reality better than my dreams. Happy Valentine's Day."
+        };
+
+        document.querySelector('.recipient-name').innerText = config.name;
+
+        // --- 2. BIOMETRIC SCAN LOGIC ---
+        let scanTimer;
+        let scanProgress = 0;
+        const circle = document.querySelector('.progress-ring__circle');
+        const scanner = document.getElementById('scanner');
+        
+        function setProgress(percent) {
+            const offset = 251 - (percent / 100) * 251;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function startScan() {
+            scanner.classList.add('scanning');
+            // Slight vibration if mobile supports it
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            scanTimer = setInterval(() => {
+                scanProgress += 2;
+                setProgress(scanProgress);
+                
+                if (scanProgress >= 100) {
+                    clearInterval(scanTimer);
+                    scanner.innerHTML = '<i class="fas fa-check" style="color:#fff; font-size: 2rem;"></i>';
+                    scanner.style.background = 'var(--accent-red)';
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    
+                    setTimeout(() => {
+                        navigate(1, 2);
+                        // Auto play music on unlock
+                        toggleMusic(true);
+                    }, 500);
+                }
+            }, 20); // Scan speed
+        }
+
+        function stopScan() {
+            if (scanProgress < 100) {
+                clearInterval(scanTimer);
+                scanner.classList.remove('scanning');
+                scanProgress = 0;
+                setProgress(0);
+            }
+        }
+
+        // --- 3. NAVIGATION & ANIMATION ---
+        function navigate(from, to) {
+            const current = document.getElementById(`stage-${from}`);
+            const next = document.getElementById(`stage-${to}`);
+            
+            current.classList.add('exit');
+            current.classList.remove('active');
+            
+            setTimeout(() => {
+                next.classList.add('active');
+                
+                if(to === 3) {
+                    typeWriter(config.message, 'typewriter-area');
+                }
+                if(to === 4) {
+                    fireworks();
+                }
+            }, 800);
+        }
+
+        function typeWriter(text, elementId) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = "";
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 40);
+                }
+            }
+            type();
+        }
+
+        // --- 4. AUDIO ---
+        const audio = document.getElementById('bg-music');
+        let isPlaying = false;
+
+        function toggleMusic(forcePlay = false) {
+            if (forcePlay || !isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    document.getElementById('music-icon').classList.remove('fa-music');
+                    document.getElementById('music-icon').classList.add('fa-pause');
+                }).catch(e => console.log("Audio requires interaction"));
+            } else {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('music-icon').classList.add('fa-music');
+                document.getElementById('music-icon').classList.remove('fa-pause');
+            }
+        }
+
+        // --- 5. VISUALS: COSMOS CANVAS ---
+        const canvas = document.getElementById('cosmos-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        let mouse = { x: null, y: null };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('touchmove', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() * 1) - 0.5;
+                this.speedY = (Math.random() * 1) - 0.5;
+                this.color = Math.random() > 0.5 ? '#ff3b6b' : '#a855f7'; // Red or Purple
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Mouse interaction
+                if (mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        this.x -= dx / 10;
+                        this.y -= dy / 10;
+                    }
+                }
+
+                if (this.size > 0.2) this.size -= 0.01; // Twinkle effect
+                else this.size += 0.05;
+
+                // Wrap around screen
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            for(let i=0; i<100; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let i=0; i<particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // --- 6. VISUALS: CONFETTI ---
+        function fireworks() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // Random bursts
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 }, colors: ['#ff3b6b', '#ffffff'] }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
